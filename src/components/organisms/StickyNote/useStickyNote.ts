@@ -1,13 +1,17 @@
-import React, {CSSProperties, MouseEvent, useState} from "react";
+import React, {CSSProperties, MouseEvent, useState, ChangeEvent} from "react";
+import {Note} from "../../../types/Note.types";
+import {updateLocalStorage} from "../../../utils/localStorage";
 
 interface useStickyNoteProps {
   id: string | number;
+  notes: Note[];
   initialPosition: { top: number; left: number };
   onDrag: (id: string | number, newPosition: { top: number; left: number }) => void;
   onResize: (id: string | number, newSize: { width: number; height: number }) => void;
+  setNotes: (notes: Note[]) => void;
 }
 
-export const useStickyNote = ({id, initialPosition, onResize, onDrag}: useStickyNoteProps) => {
+export const useStickyNote = ({id, initialPosition, onResize, onDrag, setNotes, notes}: useStickyNoteProps) => {
   const [position, setPosition] = useState(initialPosition);
   const [size, setSize] = useState({ width: 200, height: 150 });
 
@@ -15,11 +19,35 @@ export const useStickyNote = ({id, initialPosition, onResize, onDrag}: useSticky
   const [resizeType, setResizeType] = useState(''); // 'top', 'bottom', 'left', 'right'
   const [initialMouseX, setInitialMouseX] = useState(0);
   const [initialMouseY, setInitialMouseY] = useState(0);
+  const [noteContent, setNoteContent] = useState('');
 
+  const handleInputChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
+    // Update the state variable when the input value changes
+    setNoteContent(e.target.value);
+    const updatedNotes = notes.map((note) =>
+      note.id === id ? { ...note, text: e.target.value } : note
+    );
+    setNotes(updatedNotes);
+
+    updateLocalStorage<Note[]>('notes', updatedNotes);
+    console.log(e.target.value);
+    console.log(noteContent);
+  };
 
   const handleDragEnd = (e: MouseEvent) => {
     const newPosition = { top: e.clientY, left: e.clientX };
+
+    const updatedNotes = notes.map((note) => {
+      if (note.id === id) {
+        return { ...note, position: newPosition };
+      } else {
+        return note;
+      }
+    });
+    setNotes(updatedNotes);
     setPosition(newPosition);
+
+    updateLocalStorage<Note[]>('notes', updatedNotes);
   };
 
   const handleMouseUp = () => {
@@ -68,8 +96,10 @@ export const useStickyNote = ({id, initialPosition, onResize, onDrag}: useSticky
   };
 
   return {
+    noteContent,
     containerStyle,
     handleDragEnd,
     handleFormSubmit,
+    handleInputChange
   }
 }

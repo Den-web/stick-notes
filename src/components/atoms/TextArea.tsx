@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ReactNode, ChangeEvent } from 'react';
 import styled from 'styled-components';
 
 const StyledTextArea = styled.textarea`
@@ -6,12 +6,18 @@ const StyledTextArea = styled.textarea`
   height: 100%;
   outline: none;
   background-color: yellow;
-  border: none; /* Optional: Remove border for a clean look */
+  border: none;
 `;
 
-const TextArea = () => {
+interface TextAreaProps {
+  value?: string;
+  onChange?: (event: ChangeEvent<HTMLTextAreaElement>) => void;
+  children?: ReactNode;
+}
+
+const TextArea: React.FC<TextAreaProps> = ({ value, onChange }) => {
   return (
-    <StyledTextArea rows={7} />
+    <StyledTextArea rows={7} value={value} onChange={onChange} />
   );
 };
 

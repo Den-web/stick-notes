@@ -1,11 +1,18 @@
-import React from 'react';
+import React, { ChangeEvent } from 'react';
 import TextArea from '../atoms/TextArea';
 
-const NoteTitle = () => {
+interface NoteTitleProps {
+  onChange: (event: ChangeEvent<HTMLTextAreaElement>) => void;
+  value?: string;
+
+}
+
+const NoteTitle = ({onChange, value = ''}: NoteTitleProps) => {
+
   return (
     <label>
       Sticky Note Content:
-      <TextArea />
+      <TextArea value={value} onChange={onChange} />
     </label>
   );
 };
